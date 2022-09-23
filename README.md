@@ -1,4 +1,4 @@
-# NLW Valoriza
+# Compliments API
 
 ## Requisitos Funcionais
 
