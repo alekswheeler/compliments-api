@@ -1,20 +1,29 @@
-import { AppDataSource } from "./data-source"
-import { User } from "./entity/User"
+import express, { Request, Response } from 'express'
+import { Compliment } from './entities/Compliment'
+import { ComplimentsRepositories } from './modules/compliments/repositories/implementations/ComplimentsRepositories'
 
-AppDataSource.initialize().then(async () => {
+const app = express()
 
-    console.log("Inserting a new user into the database...")
-    const user = new User()
-    user.firstName = "Timber"
-    user.lastName = "Saw"
-    user.age = 25
-    await AppDataSource.manager.save(user)
-    console.log("Saved a new user with id: " + user.id)
+app.post('/complimentes', async (req: Request, res: Response) => {
+  const complimentsRepositories = new ComplimentsRepositories()
 
-    console.log("Loading users from the database...")
-    const users = await AppDataSource.manager.find(User)
-    console.log("Loaded users: ", users)
+  const compliment = new Compliment({
+    description: 'Um elogio qualquer',
+    to: 'Alex',
+    createdBy: 'lolll',
+  })
 
-    console.log("Here you can setup and run express / fastify / any other framework.")
+  await complimentsRepositories.saveCompliment(compliment)
 
-}).catch(error => console.log(error))
+  const compliments = await complimentsRepositories.listComplimentsReceived(
+    'Alex',
+  )
+
+  return res.status(200).json({
+    compliments,
+  })
+})
+
+app.listen(3000, () => {
+  console.log('Server is running at localhost 3001')
+})
