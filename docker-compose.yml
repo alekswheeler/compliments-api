@@ -1,26 +1,31 @@
-version: '3.9'
+version: "3.9"
+
 services:
-  api:
+  database_ignite:
+    image: postgres
+    container_name: compliments_db
+    restart: always
+    ports:
+     - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=tcompliments_db
+    volumes:
+     - pgdata:/data/postgres
+  app:
+    build: .
     container_name: api
     restart: always
-    build: .
     ports:
-      - ${PORT}:${PORT}
+      - "3000:3000"
+    volumes:
+      - .:/usr/app
+    links: 
+      - database_ignite
     depends_on:
-      - db
-    volumes:
-    - .:/usr/src/app
-
-  db:
-    container_name: postgres
-    image: postgres
-    ports:
-      - '5432:${DB_PORT}'
-    volumes:
-      - data:/data/db
-    environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=${DB_NAME}
+      - database_ignite
 
 volumes: 
- data: {}
+  pgdata:
+    driver: local
